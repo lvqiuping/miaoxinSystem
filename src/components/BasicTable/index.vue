@@ -8,10 +8,10 @@
           :search-form="searchForm"
           @searchFormEmit="searchFormEmit"
         />
-        <operation-button
+        <!-- <operation-button
           :button-group="buttonGroup"
           @operateEmit="operateEmit"
-        />
+        /> -->
       </div>
       <div v-if="rightButtonGroup" style="display: flex;flex-direction: row;justify-content: space-between; height: 40px; margin-bottom: 20px;">
         <el-button type="" icon="el-icon-refresh" style="margin-right: 10px; margin-left: 10px;" @click="refresh" />
@@ -97,14 +97,15 @@ export default {
     height: { type: Number, default: null },
     // eslint-disable-next-line vue/require-valid-default-prop
     headerCellStyle: { type: Object, default: function() {
-      return { background: '#409EFF', color: '#fff' }
+      return { background: '#f5f7fa', color: '#909399' }
     } },
     // 特别操作
     searchForm: { type: Object, default: null },
     isShowGroup: { type: Boolean, default: true },
     buttonGroup: { type: Object, default: null },
     leftButtonGroup: { type: Boolean, default: true },
-    rightButtonGroup: { type: Boolean, default: true }
+    rightButtonGroup: { type: Boolean, default: true },
+    defaultDate: { type: String, default: '' }
 
   },
   data() {

@@ -35,43 +35,37 @@
                 value-format="yyyy-MM-dd HH:MM:ss"
               />
             </el-form-item>
-            <el-form-item v-if="field.type === 'date2'" style="margin-right: 10px;">
+            <el-form-item v-if="field.type === 'dateType2'" style="margin-right: 10px;">
               <span>{{ field.label }}：</span>
-              <!-- <el-date-picker
-                v-model="temp[field.name]"
-                type="datetimerange"
-                :picker-options="pickerOptions"
-                range-separator="至"
-                start-placeholder="开始日期"
-                end-placeholder="结束日期"
-                align="right"
-                value-format="yyyy-MM-dd HH:MM:ss"
-              /> -->
               <el-date-picker
                 v-model="temp[field.name]"
                 type="date"
                 placeholder="选择日期"
+                :clearable="false"
                 style="margin-right: 10px;"
-                @change="handle3"
               />
             </el-form-item>
           </div>
         </div>
       </template>
-      <el-button type="primary" icon="el-icon-search" style="margin-right: 10px;" @click.native.prevent="searching()" />
+      <!-- <el-button type="primary" icon="el-icon-search" style="margin-right: 10px;" @click.native.prevent="searching()" /> -->
     </el-form>
   </div>
 </template>
 
 <script>
+import moment from 'moment'
 export default {
   name: 'SearchForm',
   props: {
-    searchForm: { type: Object, default: null }
+    searchForm: { type: Object, default: null },
+    defaultDate: { type: String, default: '' }
   },
   data() {
     return {
-      temp: {},
+      temp: {
+        Date: this.myDateFormat(new Date())
+      },
       pickerOptions: {
         shortcuts: [
           {
@@ -134,17 +128,19 @@ export default {
     // 监听对象temp，
     temp: {
       handler(newVal) {
+        console.log('newVal', newVal)
         this.$emit('searchFormEmit', newVal)
       },
       deep: true
     }
   },
   methods: {
-    handle3() {
-      console.log(' this.temp', this.temp)
-      this.searching(this.temp)
+    myDateFormat(date, fmt = 'YYYY-MM-DD') {
+    // eslint-disable-next-line no-undef
+      return moment(date).format(fmt)
     },
     searching() {
+      console.log(' this.temp', this.temp)
       this.$emit('searchFormEmit', this.temp)
     }
   }

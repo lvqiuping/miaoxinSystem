@@ -3,12 +3,12 @@
     <hamburger :is-active="sidebar.opened" class="hamburger-container" @toggleClick="toggleSideBar" />
     <breadcrumb class="breadcrumb-container" />
     <div class="right-menu">
-      <div style="margin-right: 10px;">{{ userName }}</div>
-      <el-dropdown class="avatar-container" trigger="click">
+      <div style="margin-right: 10px;">{{ userName }}88</div>
+      <!-- <el-dropdown class="avatar-container" trigger="click">
         <div class="avatar-wrapper">
           <i class="el-icon-caret-bottom" />
         </div>
-        <!-- <el-dropdown-menu slot="dropdown" class="user-dropdown">
+        <el-dropdown-menu slot="dropdown" class="user-dropdown">
           <router-link to="/">
             <el-dropdown-item>
               首页
@@ -20,8 +20,8 @@
           <el-dropdown-item divided @click.native="changePassword">
             <span style="display:block;">修改密码</span>
           </el-dropdown-item>
-        </el-dropdown-menu> -->
-      </el-dropdown>
+        </el-dropdown-menu>
+      </el-dropdown> -->
     </div>
   </div>
 </template>

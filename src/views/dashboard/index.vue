@@ -1,11 +1,45 @@
 <template>
   <div class="box ">
+    <el-row style="margin-bottom: 30px;">
+      <el-col>
+        <el-card>
+          <basic-table
+            :table-title="tableTitle"
+            :table-data="tableData"
+            :loading="loading"
+            :multiple-table="false"
+            :search-form="searchForm"
+            @refresh="getPageList(listQuery)"
+            @searchFormEmit2="searchFormEmit2"
+          >
+            <template v-slot:all="scope">
+              <el-tag :type="'primary'">
+                {{ scope.row.all }}
+              </el-tag>
+            </template>
+            <template v-slot:alls="scope">
+              <el-tag :type="'warning'">
+                {{ scope.row.alls }}
+              </el-tag>
+            </template>
+            <template v-slot:allLogin="scope">
+              <el-tag :type="'success'">
+                {{ scope.row.allLogin }}
+              </el-tag>
+            </template>
+          </basic-table>
+        </el-card>
+      </el-col>
+    </el-row>
     <el-row :gutter="10" style="margin-bottom: 10px;">
       <el-col :span="8">
         <el-card>
+          <span>日期：</span>
           <el-date-picker
             v-model="date1"
             type="date"
+            :clearable="false"
+            :loading="loadingDate1"
             placeholder="选择日期"
             style="margin-bottom: 10px;"
             @change="handle1"
@@ -15,9 +49,12 @@
       </el-col>
       <el-col :span="8">
         <el-card>
+          <span>日期：</span>
           <el-date-picker
             v-model="date2"
             type="date"
+            :clearable="false"
+            :loading="loadingDate2"
             placeholder="选择日期"
             style="margin-bottom: 10px;"
             @change="handle2"
@@ -27,10 +64,13 @@
       </el-col>
       <el-col :span="8">
         <el-card>
-          <div style="display: flex; margin-bottom: 10px;">
+          <div style="display: inline-block; margin-bottom: 10px;">
+            <span>日期：</span>
             <el-date-picker
               v-model="params3.date3"
               type="date"
+              :clearable="false"
+              :loading="loadingDate3"
               placeholder="选择日期"
               style="margin-right: 10px;"
               @change="handle3"
@@ -52,21 +92,7 @@
         </el-card>
       </el-col>
     </el-row>
-    <el-row>
-      <el-col>
-      <el-card>
-        <basic-table
-          :table-title="tableTitle"
-          :table-data="tableData"
-          :loading="loading"
-          :multiple-table="false"
-          :search-form="searchForm"
-          @refresh="getPageList()"
-          @searchFormEmit2="searchFormEmit2"
-        />
-      </el-card>
-      </el-col>
-    </el-row>
+
   </div>
 </template>
 
@@ -83,6 +109,9 @@ export default {
   data() {
     return {
       loading: false,
+      loadingDate1: false,
+      loadingDate2: false,
+      loadingDate3: false,
       tableTitle: [
         {
           label: '日期',
@@ -136,19 +165,22 @@ export default {
           label: '今日广告总数',
           value: 'all',
           show: true,
-          type: 'text'
+          type: 'slot',
+          slot: 'all'
         },
         {
           label: '今日不重复广告总数',
           value: 'alls',
           show: true,
-          type: 'text'
+          type: 'slot',
+          slot: 'alls'
         },
         {
           label: '今日累计登录人次',
           value: 'allLogin',
           show: true,
-          type: 'text'
+          type: 'slot',
+          slot: 'allLogin'
         }
       ],
       tableData: [],
@@ -162,7 +194,7 @@ export default {
         fields: [
           {
             show: true,
-            type: 'date2',
+            type: 'dateType2',
             label: '日期',
             labelShow: false,
             name: 'Date'
@@ -220,8 +252,10 @@ export default {
       this.getPieData3(this.params3.deptName, this.params3.date3)
     },
     getPieData1() {
+      this.loadingDate1 = true
       msgqtyofchatingchart({ date: this.date1 }).then((res) => {
         if (res) {
+          this.loadingDate1 = false
           for (const key in res) {
             this.pieChartData.push({ name: key, value: res[key] })
           }
@@ -229,8 +263,10 @@ export default {
       })
     },
     getPieData2() {
+      this.loadingDate2 = true
       numofchatingchart({ date: this.date2 }).then((res) => {
         if (res) {
+          this.loadingDate2 = false
           for (const key in res) {
             this.pieChartData2.push({ name: key, value: res[key] })
           }
@@ -238,8 +274,10 @@ export default {
       })
     },
     getPieData3(v, p) {
+      this.loadingDate3 = true
       saleschart({ groupName: v, date: p }).then((res) => {
         if (res) {
+          this.loadingDate3 = false
           this.name = res.DeptName
           delete res.DeptName
           for (const key in res) {
@@ -249,17 +287,19 @@ export default {
       })
     },
     getPageList(v) {
+      this.loading = true
       statsreport({ date: v.Date }).then((res) => {
         console.log('table', res)
+        this.loading = false
         res.Date = this.myDateFormat(res.Date)
         res.all = res.ADQty1 + res.ADQty2
         res.alls = res.NorepeatADQty1 + res.NorepeatADQty2
         res.allLogin = res.LoginPCQty + res.LoginAndriodQty
-        this.tableData.push(res)
+        this.tableData = Array(res)
       })
     },
     searchFormEmit2(v) {
-      console.log('v', v)
+      this.tableData = []
       v.Date = this.myDateFormat(v.Date)
       this.listQuery = Object.assign({}, this.listQuery, v)
       this.getPageList(this.listQuery)
@@ -275,7 +315,7 @@ export default {
 <style lang="scss" scoped>
 .box {
   padding: 30px 20px 20px 20px;
-  // background-color: #F2F6FC;
+  background-color: #F2F6FC;
   min-height: 100vh;
 }
 </style>
