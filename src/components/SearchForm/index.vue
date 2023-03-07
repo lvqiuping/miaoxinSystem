@@ -128,7 +128,6 @@ export default {
     // 监听对象temp，
     temp: {
       handler(newVal) {
-        console.log('newVal', newVal)
         this.$emit('searchFormEmit', newVal)
       },
       deep: true
@@ -140,7 +139,6 @@ export default {
       return moment(date).format(fmt)
     },
     searching() {
-      console.log(' this.temp', this.temp)
       this.$emit('searchFormEmit', this.temp)
     }
   }

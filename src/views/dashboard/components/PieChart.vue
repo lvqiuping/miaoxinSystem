@@ -71,19 +71,27 @@ export default {
         legend: {
           top: 'bottom'
         },
+        toolbox: {
+          show: true,
+          feature: {
+            mark: { show: true },
+            dataView: { show: true, readOnly: false },
+            restore: { show: true },
+            saveAsImage: { show: true }
+          }
+        },
         series: [
+
           {
             name: '数据统计',
             type: 'pie',
-            // roseType: 'radius', // area   radius
-            radius: '50%',
-            // center: ['50%', '50%'],
-            data: pieChartData,
-            animationEasing: 'cubicInOut',
-            animationDuration: 2600
-            // itemStyle: {
-            //   borderRadius: 8
-            // }
+            radius: [20, 100],
+            center: ['50%', '50%'],
+            roseType: 'area',
+            itemStyle: {
+              borderRadius: 8
+            },
+            data: pieChartData
           }
         ]
       })

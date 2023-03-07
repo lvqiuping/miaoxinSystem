@@ -256,9 +256,27 @@ export default {
       msgqtyofchatingchart({ date: this.date1 }).then((res) => {
         if (res) {
           this.loadingDate1 = false
-          for (const key in res) {
-            this.pieChartData.push({ name: key, value: res[key] })
+          const pieChartDataCoyp = []
+          for (var key in res) {
+            pieChartDataCoyp.push({ name: key, value: res[key] })
           }
+          pieChartDataCoyp.forEach((item) => {
+            for (var n = 1; n <= pieChartDataCoyp.length; n++) {
+              var a = 'Interval' + [n]
+              if (n <= 10) {
+                if (item.name === a) {
+                  item.name = [(n - 1) * 10 + 1 + '-' + n * 10]
+                }
+              } else {
+                if (item.name === a) {
+                  item.name = '>100'
+                }
+              }
+            }
+          })
+          pieChartDataCoyp.forEach(item => {
+            this.pieChartData.push({ name: '[' + item.name + ']', value: item.value })
+          })
         }
       })
     },
@@ -267,9 +285,30 @@ export default {
       numofchatingchart({ date: this.date2 }).then((res) => {
         if (res) {
           this.loadingDate2 = false
-          for (const key in res) {
-            this.pieChartData2.push({ name: key, value: res[key] })
+          // for (const key in res) {
+          //   this.pieChartData2.push({ name: key, value: res[key] })
+          // }
+          const pieChartDataCoyp = []
+          for (var key in res) {
+            pieChartDataCoyp.push({ name: key, value: res[key] })
           }
+          pieChartDataCoyp.forEach((item) => {
+            for (var n = 1; n <= pieChartDataCoyp.length; n++) {
+              var a = 'Interval' + [n]
+              if (n <= 10) {
+                if (item.name === a) {
+                  item.name = [(n - 1) * 10 + 1 + '-' + n * 10]
+                }
+              } else {
+                if (item.name === a) {
+                  item.name = '>100'
+                }
+              }
+            }
+          })
+          pieChartDataCoyp.forEach(item => {
+            this.pieChartData2.push({ name: '[' + item.name + ']', value: item.value })
+          })
         }
       })
     },
@@ -280,16 +319,36 @@ export default {
           this.loadingDate3 = false
           this.name = res.DeptName
           delete res.DeptName
-          for (const key in res) {
-            this.pieChartData3.push({ name: key, value: res[key] })
+          // for (const key in res) {
+          //   this.pieChartData3.push({ name: key, value: res[key] })
+          // }
+          const pieChartDataCoyp = []
+          for (var key in res) {
+            pieChartDataCoyp.push({ name: key, value: res[key] })
           }
+          pieChartDataCoyp.forEach((item) => {
+            for (var n = 1; n <= pieChartDataCoyp.length; n++) {
+              var a = 'Interval' + [n]
+              if (n <= 10) {
+                if (item.name === a) {
+                  item.name = [(n - 1) * 10 + 1 + '-' + n * 10]
+                }
+              } else {
+                if (item.name === a) {
+                  item.name = '>100'
+                }
+              }
+            }
+          })
+          pieChartDataCoyp.forEach(item => {
+            this.pieChartData3.push({ name: '[' + item.name + ']', value: item.value })
+          })
         }
       })
     },
     getPageList(v) {
       this.loading = true
       statsreport({ date: v.Date }).then((res) => {
-        console.log('table', res)
         this.loading = false
         res.Date = this.myDateFormat(res.Date)
         res.all = res.ADQty1 + res.ADQty2
