@@ -155,3 +155,48 @@ export function export2Excel(tData, tTitle, tName) {
 export function formatJson(filterVal, jsonData) {
   return jsonData.map(v => filterVal.map(j => v[j]))
 }
+
+export function timeThree() {
+  // 当天
+  let thatDay = ''
+  // 当月第一天
+  let oneDayTime = ''
+  // 当月最后一天
+  let zDay = ''
+  let date = new Date();
+  let curr_date = date.getDate();
+  let curr_month = date.getMonth() + 1;
+  let curr_year = date.getFullYear();
+  String(curr_month).length < 2 ? (curr_month = "0" + curr_month) : curr_month;
+  String(curr_date).length < 2 ? (curr_date = "0" + curr_date) : curr_date;
+  thatDay = curr_year + "-" + curr_month + "-" + curr_date;
+
+  String(curr_year).length < 2 ? (curr_year = "0" + curr_year) : curr_year;
+  var m = date.getMonth() + 1;
+  String(m).length < 2
+    ? (m = "0" + m)
+    : m;
+  var d = '01';
+  oneDayTime = curr_year + "-" + m + "-" + d;
+//结束时间
+  var currentMonth=date.getMonth();
+  var nextMonth=++currentMonth;
+  var nextMonthFirstDay=new Date(date.getFullYear(),nextMonth,1);
+  var oneDay=1000*60*60*24;
+  var date1 = new Date(nextMonthFirstDay-oneDay);
+  var yy = date1.getFullYear();
+  String(yy).length < 2
+    ? (yy = "0" + yy)
+    : yy;
+  var mm = date1.getMonth() + 1;
+  String(mm).length < 2
+    ? (mm = "0" + mm)
+    : mm
+  var dd = date1.getDate();
+  String(dd).length < 2
+    ? (dd = "0" + dd)
+    : dd;
+   zDay = yy + "-" + mm + "-" + dd;
+  return [thatDay,oneDayTime,zDay]
+}
+

@@ -31,7 +31,7 @@ export default {
     },
     height: {
       type: String,
-      default: '500px'
+      default: '530px'
     },
     pieChartData: {
       type: Array,

@@ -1,80 +1,49 @@
 <template>
   <div class="box ">
-    <el-row style="margin-bottom: 30px;">
+    <el-row style="margin-bottom: 10px;">
       <el-col>
         <el-card>
           <basic-table
             :table-title="tableTitle"
             :table-data="tableData"
             :loading="loading"
-            :multiple-table="false"
+            :multiple-table="true"
             :search-form="searchForm"
+            :button-group="buttonGroup"
+            :header-cell-style="headerCellStyle"
+            @operateEmit2="operateEmit2"
             @refresh="getPageList(listQuery)"
             @searchFormEmit2="searchFormEmit2"
           >
-            <template v-slot:all="scope">
+            <template v-slot:advsTotal="scope">
               <el-tag :type="'primary'">
-                {{ scope.row.all }}
+                {{ scope.row.advsTotal }}
               </el-tag>
             </template>
-            <template v-slot:alls="scope">
+            <template v-slot:ChatingQty="scope">
               <el-tag :type="'warning'">
-                {{ scope.row.alls }}
-              </el-tag>
-            </template>
-            <template v-slot:allLogin="scope">
-              <el-tag :type="'success'">
-                {{ scope.row.allLogin }}
+                {{ scope.row.ChatingQty }}
               </el-tag>
             </template>
           </basic-table>
+          <!-- <pagination v-show="total > 0" :total="total" :page.sync="listQuery.pageIndex" :limit.sync="listQuery.pageSize" @pagination="getPageList()" /> -->
         </el-card>
       </el-col>
     </el-row>
     <el-row :gutter="10" style="margin-bottom: 10px;">
-      <el-col :span="8">
+      <el-col v-if="pieChartData.length" :span="8">
         <el-card>
-          <span>日期：</span>
-          <el-date-picker
-            v-model="date1"
-            type="date"
-            :clearable="false"
-            :loading="loadingDate1"
-            placeholder="选择日期"
-            style="margin-bottom: 10px;"
-            @change="handle1"
-          />
-          <pie-chart v-if="pieChartData.length" :id="'1'" :pie-chart-data="pieChartData" :pie-title="'用户私聊消息数量'" />
+          <pie-chart :id="'1'" :pie-chart-data="pieChartData" :pie-title="'用户私聊消息数量'" />
         </el-card>
       </el-col>
-      <el-col :span="8">
+      <el-col v-if="pieChartData2.length" :span="8">
         <el-card>
-          <span>日期：</span>
-          <el-date-picker
-            v-model="date2"
-            type="date"
-            :clearable="false"
-            :loading="loadingDate2"
-            placeholder="选择日期"
-            style="margin-bottom: 10px;"
-            @change="handle2"
-          />
-          <pie-chart v-if="pieChartData2.length" :id="'2'" :pie-chart-data="pieChartData2" :pie-title="'用户私聊次数'" />
+          <pie-chart :id="'2'" :pie-chart-data="pieChartData2" :pie-title="'用户私聊次数'" />
         </el-card>
       </el-col>
-      <el-col :span="8">
+      <el-col v-if="pieChartData3.length" :span="8">
         <el-card>
-          <div style="display: inline-block; margin-bottom: 10px;">
-            <span>日期：</span>
-            <el-date-picker
-              v-model="params3.date3"
-              type="date"
-              :clearable="false"
-              :loading="loadingDate3"
-              placeholder="选择日期"
-              style="margin-right: 10px;"
-              @change="handle3"
-            />
+          <div style="display: flex; justify-content: flex-end;">
             <el-select
               v-model="params3.deptName"
               placeholder="请选择"
@@ -88,7 +57,7 @@
               />
             </el-select>
           </div>
-          <pie-chart v-if="pieChartData3.length" :id="'3'" :pie-chart-data="pieChartData3" :pie-title="'业务部广告发布情况('+ params3.deptName +')'" />
+          <pie-chart :id="'3'" :pie-chart-data="pieChartData3" :height="'490px'" :pie-title="'业务部广告发布情况('+ params3.deptName +')'" />
         </el-card>
       </el-col>
     </el-row>
@@ -101,6 +70,9 @@ import BasicTable from '@/components/BasicTable/index.vue'
 import PieChart from './components/PieChart'
 import { msgqtyofchatingchart, numofchatingchart, saleschart, statsreport } from '@/api/dashboard'
 import moment from 'moment'
+import { timeThree } from '@/utils/index'
+// import Pagination from '@/components/BasicTable/Pagination.vue'
+import { TipsBox } from '@/utils/feedback'
 export default {
   name: 'Dashboard',
   components: {
@@ -120,72 +92,101 @@ export default {
           type: 'text'
         },
         {
-          label: '单向私聊次数',
+          label: '广告总数',
+          value: 'advsTotal',
+          show: true,
+          type: 'slot',
+          slot: 'advsTotal'
+        },
+        // {
+        //   label: 'PC端发送广告数',
+        //   value: 'pcTotal',
+        //   show: true,
+        //   type: 'text'
+        // },
+        // {
+        //   label: '手机端发送广告数',
+        //   value: 'andriodTotal',
+        //   show: true,
+        //   type: 'text'
+        // },
+        {
+          label: '不重复广告总数',
+          value: 'advTotal',
+          show: true,
+          type: 'text'
+        },
+        {
+          label: '（单向）私聊次数',
           value: 'ChatingQty',
           show: true,
-          type: 'text'
-        },
-        {
-          label: 'PC端登录人次',
-          value: 'LoginPCQty',
-          show: true,
-          type: 'text'
-        },
-        {
-          label: '手机端登录人次',
-          value: 'LoginAndriodQty',
-          show: true,
-          type: 'text'
-        },
-        {
-          label: '一部广告总数',
-          value: 'ADQty1',
-          show: true,
-          type: 'text'
-        },
-        {
-          label: '一部不重复广告总数',
-          value: 'NorepeatADQty1',
-          show: true,
-          type: 'text'
-        },
-        {
-          label: '二部广告总数',
-          value: 'ADQty2',
-          show: true,
-          type: 'text'
-        },
-        {
-          label: '二部不重复广告总数',
-          value: 'NorepeatADQty2',
-          show: true,
-          type: 'text'
-        },
-        {
-          label: '今日广告总数',
-          value: 'all',
-          show: true,
           type: 'slot',
-          slot: 'all'
+          slot: 'ChatingQty'
         },
         {
-          label: '今日不重复广告总数',
-          value: 'alls',
+          label: '今日累计在线人数',
+          value: 'today',
           show: true,
-          type: 'slot',
-          slot: 'alls'
+          type: 'text'
         },
+        // {
+        //   label: '总在线人数',
+        //   value: 'loginTotal',
+        //   show: true,
+        //   type: 'text'
+        // },
+        // {
+        //   label: 'pc端在线人数',
+        //   value: 'LoginPCQty',
+        //   show: true,
+        //   type: 'text'
+        // },
+        // {
+        //   label: '手机端在线人数',
+        //   value: 'LoginAndriodQty',
+        //   show: true,
+        //   type: 'text'
+        // },
         {
-          label: '今日累计登录人次',
-          value: 'allLogin',
+          label: '一部',
+          value: 'yibu',
           show: true,
-          type: 'slot',
-          slot: 'allLogin'
+          type: 'text'
+        },
+        // {
+        //   label: '一部广告总数',
+        //   value: 'ADQty1',
+        //   show: true,
+        //   type: 'text'
+        // },
+        // {
+        //   label: '一部不重复广告数',
+        //   value: 'NorepeatADQty1',
+        //   show: true,
+        //   type: 'text'
+        // },
+        {
+          label: '二部',
+          value: 'erbu',
+          show: true,
+          type: 'text'
         }
+        // {
+        //   label: '二部广告总数',
+        //   value: 'ADQty2',
+        //   show: true,
+        //   type: 'text'
+        // },
+        // {
+        //   label: '二部不重复广告数',
+        //   value: 'NorepeatADQty2',
+        //   show: true,
+        //   type: 'text'
+        // }
       ],
       tableData: [],
+      // total: 0,
       listQuery: {
-        Date: this.myDateFormat(new Date())
       },
       searchForm: {
         expend: true,
@@ -194,7 +195,7 @@ export default {
         fields: [
           {
             show: true,
-            type: 'dateType2',
+            type: 'date',
             label: '日期',
             labelShow: false,
             name: 'Date'
@@ -204,7 +205,6 @@ export default {
       pieChartData: [],
       pieChartData2: [],
       pieChartData3: [],
-      date1: this.myDateFormat(new Date()),
       date2: this.myDateFormat(new Date()),
       options: [
         {
@@ -218,42 +218,76 @@ export default {
 
       ],
       params3: {
-        date3: this.myDateFormat(new Date()),
-        deptName: ''
+        deptName: '',
+        deptDate: ''
+      },
+      buttonGroup: {
+        expend: true,
+        title: '表格筛选',
+        size: 'default',
+        fields: [
+          {
+            showButtonGroup: true,
+            text: '查看饼图',
+            icon: 'el-icon-check',
+            operateType: 'check'
+          }
+        ]
       }
     }
   },
   created() {
-    this.getPieData1()
-    this.getPieData2()
     this.params3.deptName = this.options[0].value
-    this.getPieData3(this.params3.deptName, this.params3.date3)
+    this.listQuery = {
+      beginTime: timeThree()[1],
+      endTime: timeThree()[0]
+    }
+    // this.getPieData1(this.listQuery.beginTime)
+    // this.getPieData2(this.listQuery.beginTime)
+    // this.getPieData3(this.params3.deptName, this.listQuery.beginTime)
     this.getPageList(this.listQuery)
   },
   methods: {
+    operateEmit2(v, list) {
+      console.log(list)
+      if (v === 'check') {
+        if (list.length !== 1) {
+          TipsBox('warning', '请选择数据进行查看')
+          return
+        } else {
+          this.pieChartData = []
+          this.pieChartData2 = []
+          this.pieChartData3 = []
+          const a = list[0].Date
+          this.params3.deptDate = a
+          this.getPieData1(a)
+          this.getPieData2(a)
+          this.getPieData3(this.params3.deptName, a)
+        }
+      }
+    },
+    headerCellStyle({ row, column, rowIndex, columnIndex }) {
+      // console.log('zhe', rowIndex)
+      // console.log(columnIndex)
+      // console.log('rowIndex', rowIndex)
+      // console.log('columnIndex', columnIndex)
+      // if (rowIndex === 1) {
+      //   return [0, 1]  
+      //   return { background: 'pink', color: '#909399' }
+      // }
+      // if (columnIndex === 5 && rowIndex === 0) {
+      //   // return 'header-row-display'
+      //   return { background: 'red', color: '#909399' }
+      // }
+    },
     handleOptions(v) {
       this.pieChartData3 = []
       this.params3.deptName = v
-      this.getPieData3(this.params3.deptName, this.params3.date3)
+      this.getPieData3(this.params3.deptName, this.params3.deptDate)
     },
-    handle1() {
-      this.pieChartData = []
-      this.date1 = this.myDateFormat(this.date1)
-      this.getPieData1()
-    },
-    handle2() {
-      this.pieChartData2 = []
-      this.date2 = this.myDateFormat(this.date2)
-      this.getPieData2()
-    },
-    handle3() {
-      this.pieChartData3 = []
-      this.params3.date3 = this.myDateFormat(this.params3.date3)
-      this.getPieData3(this.params3.deptName, this.params3.date3)
-    },
-    getPieData1() {
+    getPieData1(v) {
       this.loadingDate1 = true
-      msgqtyofchatingchart({ date: this.date1 }).then((res) => {
+      msgqtyofchatingchart({ date: v }).then((res) => {
         if (res) {
           this.loadingDate1 = false
           const pieChartDataCoyp = []
@@ -280,9 +314,9 @@ export default {
         }
       })
     },
-    getPieData2() {
+    getPieData2(v) {
       this.loadingDate2 = true
-      numofchatingchart({ date: this.date2 }).then((res) => {
+      numofchatingchart({ date: v }).then((res) => {
         if (res) {
           this.loadingDate2 = false
           // for (const key in res) {
@@ -312,9 +346,9 @@ export default {
         }
       })
     },
-    getPieData3(v, p) {
+    getPieData3(n, v) {
       this.loadingDate3 = true
-      saleschart({ groupName: v, date: p }).then((res) => {
+      saleschart({ groupName: n, date: v }).then((res) => {
         if (res) {
           this.loadingDate3 = false
           this.name = res.DeptName
@@ -348,18 +382,21 @@ export default {
     },
     getPageList(v) {
       this.loading = true
-      statsreport({ date: v.Date }).then((res) => {
+      statsreport(v).then((res) => {
         this.loading = false
-        res.Date = this.myDateFormat(res.Date)
-        res.all = res.ADQty1 + res.ADQty2
-        res.alls = res.NorepeatADQty1 + res.NorepeatADQty2
-        res.allLogin = res.LoginPCQty + res.LoginAndriodQty
-        this.tableData = Array(res)
+        res.forEach((item) => {
+          item.Date = this.myDateFormat(item.Date),
+          item.advsTotal = item.ADQty1 + item.ADQty2, // 广告总数
+          item.pcTotal = item.PcQty1 + item.PcQty2, // pc端广告
+          item.andriodTotal = item.AndriodQty1 + item.AndriodQty2, // 手机端广告
+          item.advTotal = (item.ADQty1 + item.ADQty2) - (item.NorepeatADQty1 + item.NorepeatADQty2), // 不重复广告
+          item.loginTotal = item.LoginPCQty + item.LoginAndriodQty // 总在线人数
+        })
+        this.tableData = res
       })
     },
     searchFormEmit2(v) {
       this.tableData = []
-      v.Date = this.myDateFormat(v.Date)
       this.listQuery = Object.assign({}, this.listQuery, v)
       this.getPageList(this.listQuery)
     },

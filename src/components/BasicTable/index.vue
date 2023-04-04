@@ -8,10 +8,10 @@
           :search-form="searchForm"
           @searchFormEmit="searchFormEmit"
         />
-        <!-- <operation-button
+        <operation-button
           :button-group="buttonGroup"
           @operateEmit="operateEmit"
-        /> -->
+        />
       </div>
       <div v-if="rightButtonGroup" style="display: flex;flex-direction: row;justify-content: space-between; height: 40px; margin-bottom: 20px;">
         <el-button type="" icon="el-icon-refresh" style="margin-right: 10px; margin-left: 10px;" @click="refresh" />
@@ -33,11 +33,13 @@
       v-loading="loading"
       :data="tableData"
       :height="height"
+      :span-method="spanMethod"
       :row-class-name="rowClassName"
       :header-cell-style="headerCellStyle"
+      :header-cell-class-name="leftheaderStyle"
       style="width: 100%"
       border
-      @selection-change="handleSelectionChange"
+      @select="select"
     >
       <!-- @sort-change="sortChange" -->
       <el-table-column v-if="multipleTable === true" type="selection" width="55" />
@@ -49,6 +51,45 @@
         :sortable="item.sortable === true"
         align="center"
       >
+        <el-table-column v-if="item.value === 'today'">
+          <el-table-column
+            label="总在线人数"
+          >
+            <template slot-scope="scope">
+              <el-tag :type="'success'">
+                {{ scope.row.loginTotal }}
+              </el-tag>
+            </template>
+          </el-table-column>
+          <el-table-column
+            prop="LoginPCQty"
+            label="pc端在线人数"
+          />
+          <el-table-column
+            prop="LoginAndriodQty"
+            label="手机端在线人数"
+          />
+        </el-table-column>
+        <el-table-column v-if="item.value === 'yibu'">
+          <el-table-column
+            prop="ADQty1"
+            label="一部广告总数"
+          />
+          <el-table-column
+            prop="NorepeatADQty1"
+            label="一部不重复广告数"
+          />
+        </el-table-column>
+        <el-table-column v-if="item.value === 'erbu'">
+          <el-table-column
+            prop="ADQty2"
+            label="二部广告总数"
+          />
+          <el-table-column
+            prop="NorepeatADQty2"
+            label="二部不重复广告数"
+          />
+        </el-table-column>
         <template v-slot="scope">
           <div v-if="item.type == 'text'">
             {{ scope.row[item.value] }}
@@ -96,7 +137,7 @@ export default {
     loading: { type: Boolean, default: false },
     height: { type: Number, default: null },
     // eslint-disable-next-line vue/require-valid-default-prop
-    headerCellStyle: { type: Object, default: function() {
+    headerCellStyle: { type: Function, default: function() {
       return { background: '#f5f7fa', color: '#909399' }
     } },
     // 特别操作
@@ -110,7 +151,7 @@ export default {
   },
   data() {
     return {
-      // selectDate: [],
+      multipleSelection: [],
       total: 0,
       b_data: {},
       temp: {
@@ -119,6 +160,22 @@ export default {
     }
   },
   methods: {
+    spanMethod({columnIndex, rowIndex}){
+      if(columnIndex === 5){
+        if(rowIndex % 2 === 0){
+          return {
+       rowspan: 2,//合并的行数
+       colspan: 1//合并的列数，设为０则直接不显示
+      }
+        }else{
+          return {
+       rowspan: 0,
+       colspan: 0
+      };
+        }
+      }
+
+    },
     getQuery(params, row) {
       const p = {}
       for (const i in params) {
@@ -126,31 +183,32 @@ export default {
       }
       return p
     },
+    // 隐藏表头复选框
+    leftheaderStyle(row) {
+      if (row.columnIndex === 0 && row.rowIndex === 0) {
+        return 'seltAllbtnDis'
+      }
+    },
     rowClassName({ row, rowIndex }) {
       row.index = rowIndex
       row.xh = rowIndex + 1
     },
-    // sortChange({ column, prop, order }) {
-    //   if (order === 'ascending') {
-    //     this.temp.orderBy = prop
-    //   } else if (order === 'descending') {
-    //     this.temp.orderBy = prop + ' desc'
-    //   }
-    //   this.$emit('sortChange', this.temp)
-    // },
     searchFormEmit(v) {
       this.b_data = v
       this.$emit('searchFormEmit2', this.b_data)
     },
     operateEmit(v) {
-      this.$emit('operateEmit2', v)
+      this.$emit('operateEmit2', v, this.multipleSelection)
     },
-    handleSelectionChange(val) {
-      this.$emit('batchDeleted', val)
+    select(selection, row) {
+      // 清除 所有勾选项
+      this.$refs.multipleTableRef.clearSelection()
+      // // 当表格数据都没有被勾选的时候 就返回
+      // // 主要用于将当前勾选的表格状态清除
+      if (selection.length === 0) return
+      this.$refs.multipleTableRef.toggleRowSelection(row, true)
+      this.multipleSelection[0] = row
     },
-    // batchDeleted() {
-    //   this.$emit('batchDeleted', this.selectDate)
-    // },
     refresh() {
       this.$emit('refresh')
     }
@@ -159,5 +217,7 @@ export default {
 </script>
 
 <style scoped>
-
+::v-deep .seltAllbtnDis .cell {
+    visibility: hidden;
+}
 </style>

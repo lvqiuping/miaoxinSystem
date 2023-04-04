@@ -26,13 +26,13 @@
               <span>{{ field.label }}：</span>
               <el-date-picker
                 v-model="temp[field.name]"
-                type="datetimerange"
-                :picker-options="pickerOptions"
+                type="daterange"
                 range-separator="至"
                 start-placeholder="开始日期"
                 end-placeholder="结束日期"
                 align="right"
-                value-format="yyyy-MM-dd HH:MM:ss"
+                value-format="yyyy-MM-dd"
+                @change="searching()"
               />
             </el-form-item>
             <el-form-item v-if="field.type === 'dateType2'" style="margin-right: 10px;">
@@ -48,13 +48,13 @@
           </div>
         </div>
       </template>
-      <!-- <el-button type="primary" icon="el-icon-search" style="margin-right: 10px;" @click.native.prevent="searching()" /> -->
     </el-form>
   </div>
 </template>
 
 <script>
 import moment from 'moment'
+import { timeThree } from '@/utils/index'
 export default {
   name: 'SearchForm',
   props: {
@@ -64,81 +64,28 @@ export default {
   data() {
     return {
       temp: {
-        Date: this.myDateFormat(new Date())
-      },
-      pickerOptions: {
-        shortcuts: [
-          {
-            text: '全部',
-            onClick(picker) {
-              const end = ''
-              const start = ''
-              picker.$emit('pick', [start, end])
-            }
-          },
-          {
-            text: '3天内',
-            onClick(picker) {
-              const end = new Date()
-              const start = new Date()
-              start.setTime(start.getTime() - 3600 * 1000 * 24 * 3)
-              picker.$emit('pick', [start, end])
-            }
-          },
-          {
-            text: '一周内',
-            onClick(picker) {
-              const end = new Date()
-              const start = new Date()
-              start.setTime(start.getTime() - 3600 * 1000 * 24 * 7)
-              picker.$emit('pick', [start, end])
-            }
-          }, {
-            text: '三个月',
-            onClick(picker) {
-              const end = new Date()
-              const start = new Date()
-              start.setTime(start.getTime() - 3600 * 1000 * 24 * 90)
-              picker.$emit('pick', [start, end])
-            }
-          },
-          {
-            text: '半年内',
-            onClick(picker) {
-              const end = new Date()
-              const start = new Date()
-              start.setTime(start.getTime() - 3600 * 1000 * 24 * 180)
-              picker.$emit('pick', [start, end])
-            }
-          },
-          {
-            text: '一年内',
-            onClick(picker) {
-              const end = new Date()
-              const start = new Date()
-              start.setTime(start.getTime() - 3600 * 1000 * 24 * 365)
-              picker.$emit('pick', [start, end])
-            }
-          }
-        ]
+        Date: [new Date(timeThree()[1]), new Date(timeThree()[0])]
       }
     }
   },
-  watch: {
-    // 监听对象temp，
-    temp: {
-      handler(newVal) {
-        this.$emit('searchFormEmit', newVal)
-      },
-      deep: true
-    }
-  },
+  // watch: {
+  //   // 监听对象temp，
+  //   temp: {
+  //     handler(newVal) {
+  //       console.log('newVal', newVal)
+  //       this.$emit('searchFormEmit', newVal)
+  //     },
+  //     deep: true
+  //   }
+  // },
   methods: {
     myDateFormat(date, fmt = 'YYYY-MM-DD') {
     // eslint-disable-next-line no-undef
       return moment(date).format(fmt)
     },
     searching() {
+      this.temp.beginTime = this.temp.Date[0]
+      this.temp.endTime = this.temp.Date[1]
       this.$emit('searchFormEmit', this.temp)
     }
   }
