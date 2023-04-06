@@ -1,5 +1,5 @@
 <template>
-  <div class="box ">
+  <div class="box">
     <el-row style="margin-bottom: 10px;">
       <el-col>
         <el-card>
@@ -10,7 +10,6 @@
             :multiple-table="true"
             :search-form="searchForm"
             :button-group="buttonGroup"
-            :header-cell-style="headerCellStyle"
             @operateEmit2="operateEmit2"
             @refresh="getPageList(listQuery)"
             @searchFormEmit2="searchFormEmit2"
@@ -26,24 +25,30 @@
               </el-tag>
             </template>
           </basic-table>
-          <!-- <pagination v-show="total > 0" :total="total" :page.sync="listQuery.pageIndex" :limit.sync="listQuery.pageSize" @pagination="getPageList()" /> -->
         </el-card>
       </el-col>
     </el-row>
+    <el-dialog :title="'日期：' + choseDate" :visible.sync="dialogTableVisible" width="100%">
     <el-row :gutter="10" style="margin-bottom: 10px;">
       <el-col v-if="pieChartData.length" :span="8">
+       <div class="pie">
         <el-card>
           <pie-chart :id="'1'" :pie-chart-data="pieChartData" :pie-title="'用户私聊消息数量'" />
         </el-card>
+       </div>
       </el-col>
       <el-col v-if="pieChartData2.length" :span="8">
+        <div class="pie">
         <el-card>
           <pie-chart :id="'2'" :pie-chart-data="pieChartData2" :pie-title="'用户私聊次数'" />
         </el-card>
+      </div>
       </el-col>
       <el-col v-if="pieChartData3.length" :span="8">
+        <div class="pie">
         <el-card>
-          <div style="display: flex; justify-content: flex-end;">
+          <div style="margin-bottom: 10px;">
+            <!-- display: flex; justify-content: flex-end; -->
             <el-select
               v-model="params3.deptName"
               placeholder="请选择"
@@ -57,11 +62,12 @@
               />
             </el-select>
           </div>
-          <pie-chart :id="'3'" :pie-chart-data="pieChartData3" :height="'490px'" :pie-title="'业务部广告发布情况('+ params3.deptName +')'" />
+          <pie-chart :id="'3'" :pie-chart-data="pieChartData3" :height="'410px'" :pie-title="'业务部广告发布情况('+ params3.deptName +')'" />
         </el-card>
+        </div>
       </el-col>
     </el-row>
-
+  </el-dialog>
   </div>
 </template>
 
@@ -71,7 +77,6 @@ import PieChart from './components/PieChart'
 import { msgqtyofchatingchart, numofchatingchart, saleschart, statsreport } from '@/api/dashboard'
 import moment from 'moment'
 import { timeThree } from '@/utils/index'
-// import Pagination from '@/components/BasicTable/Pagination.vue'
 import { TipsBox } from '@/utils/feedback'
 export default {
   name: 'Dashboard',
@@ -80,6 +85,7 @@ export default {
   },
   data() {
     return {
+      dialogTableVisible: false,
       loading: false,
       loadingDate1: false,
       loadingDate2: false,
@@ -185,9 +191,7 @@ export default {
         // }
       ],
       tableData: [],
-      // total: 0,
-      listQuery: {
-      },
+      listQuery: {},
       searchForm: {
         expend: true,
         title: '表格筛选',
@@ -205,7 +209,6 @@ export default {
       pieChartData: [],
       pieChartData2: [],
       pieChartData3: [],
-      date2: this.myDateFormat(new Date()),
       options: [
         {
           value: '信息一部',
@@ -229,11 +232,12 @@ export default {
           {
             showButtonGroup: true,
             text: '查看饼图',
-            icon: 'el-icon-check',
+            icon: 'el-icon-search',
             operateType: 'check'
           }
         ]
-      }
+      },
+      choseDate: null
     }
   },
   created() {
@@ -249,36 +253,23 @@ export default {
   },
   methods: {
     operateEmit2(v, list) {
-      console.log(list)
       if (v === 'check') {
         if (list.length !== 1) {
           TipsBox('warning', '请选择数据进行查看')
           return
         } else {
+          this.dialogTableVisible = true
           this.pieChartData = []
           this.pieChartData2 = []
           this.pieChartData3 = []
           const a = list[0].Date
+          this.choseDate = a
           this.params3.deptDate = a
           this.getPieData1(a)
           this.getPieData2(a)
           this.getPieData3(this.params3.deptName, a)
         }
       }
-    },
-    headerCellStyle({ row, column, rowIndex, columnIndex }) {
-      // console.log('zhe', rowIndex)
-      // console.log(columnIndex)
-      // console.log('rowIndex', rowIndex)
-      // console.log('columnIndex', columnIndex)
-      // if (rowIndex === 1) {
-      //   return [0, 1]  
-      //   return { background: 'pink', color: '#909399' }
-      // }
-      // if (columnIndex === 5 && rowIndex === 0) {
-      //   // return 'header-row-display'
-      //   return { background: 'red', color: '#909399' }
-      // }
     },
     handleOptions(v) {
       this.pieChartData3 = []
@@ -319,9 +310,6 @@ export default {
       numofchatingchart({ date: v }).then((res) => {
         if (res) {
           this.loadingDate2 = false
-          // for (const key in res) {
-          //   this.pieChartData2.push({ name: key, value: res[key] })
-          // }
           const pieChartDataCoyp = []
           for (var key in res) {
             pieChartDataCoyp.push({ name: key, value: res[key] })
@@ -353,9 +341,6 @@ export default {
           this.loadingDate3 = false
           this.name = res.DeptName
           delete res.DeptName
-          // for (const key in res) {
-          //   this.pieChartData3.push({ name: key, value: res[key] })
-          // }
           const pieChartDataCoyp = []
           for (var key in res) {
             pieChartDataCoyp.push({ name: key, value: res[key] })
@@ -414,4 +399,7 @@ export default {
   background-color: #F2F6FC;
   min-height: 100vh;
 }
+// .pie ::v-deep .el-card__body{
+//   padding: 0
+// }
 </style>

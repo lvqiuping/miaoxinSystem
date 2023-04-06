@@ -33,7 +33,6 @@
       v-loading="loading"
       :data="tableData"
       :height="height"
-      :span-method="spanMethod"
       :row-class-name="rowClassName"
       :header-cell-style="headerCellStyle"
       :header-cell-class-name="leftheaderStyle"
@@ -54,6 +53,7 @@
         <el-table-column v-if="item.value === 'today'">
           <el-table-column
             label="总在线人数"
+            align="center"
           >
             <template slot-scope="scope">
               <el-tag :type="'success'">
@@ -64,30 +64,36 @@
           <el-table-column
             prop="LoginPCQty"
             label="pc端在线人数"
+            align="center"
           />
           <el-table-column
             prop="LoginAndriodQty"
             label="手机端在线人数"
+            align="center"
           />
         </el-table-column>
         <el-table-column v-if="item.value === 'yibu'">
           <el-table-column
             prop="ADQty1"
             label="一部广告总数"
+            align="center"
           />
           <el-table-column
             prop="NorepeatADQty1"
             label="一部不重复广告数"
+            align="center"
           />
         </el-table-column>
         <el-table-column v-if="item.value === 'erbu'">
           <el-table-column
             prop="ADQty2"
             label="二部广告总数"
+            align="center"
           />
           <el-table-column
             prop="NorepeatADQty2"
             label="二部不重复广告数"
+            align="center"
           />
         </el-table-column>
         <template v-slot="scope">
@@ -160,22 +166,6 @@ export default {
     }
   },
   methods: {
-    spanMethod({columnIndex, rowIndex}){
-      if(columnIndex === 5){
-        if(rowIndex % 2 === 0){
-          return {
-       rowspan: 2,//合并的行数
-       colspan: 1//合并的列数，设为０则直接不显示
-      }
-        }else{
-          return {
-       rowspan: 0,
-       colspan: 0
-      };
-        }
-      }
-
-    },
     getQuery(params, row) {
       const p = {}
       for (const i in params) {
@@ -183,12 +173,17 @@ export default {
       }
       return p
     },
-    // 隐藏表头复选框
     leftheaderStyle(row) {
+      // 隐藏表头复选框
       if (row.columnIndex === 0 && row.rowIndex === 0) {
         return 'seltAllbtnDis'
       }
+      // 合并表头
+      if (row.rowIndex === 1) {
+        return 'header-row-display'
+      }
     },
+    // 序号显示
     rowClassName({ row, rowIndex }) {
       row.index = rowIndex
       row.xh = rowIndex + 1
@@ -219,5 +214,8 @@ export default {
 <style scoped>
 ::v-deep .seltAllbtnDis .cell {
     visibility: hidden;
+}
+::v-deep .header-row-display {
+  display: none;
 }
 </style>

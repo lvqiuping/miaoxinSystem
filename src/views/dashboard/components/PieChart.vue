@@ -3,7 +3,7 @@
     <!-- <div style="font-weight: 600; margin-bottom: 20px;">{{ pieTitle }}</div> -->
     <el-row>
       <el-col>
-        <div :id="id" :class="className" :style="{height:height,width:width,backgroundColor: '#fff',padding: '20px'}" />
+        <div :id="id" :class="className" :style="{height:height,width:width,padding: '0px'}" />
       </el-col>
     </el-row>
   </div>
@@ -31,7 +31,7 @@ export default {
     },
     height: {
       type: String,
-      default: '530px'
+      default: '460px'
     },
     pieChartData: {
       type: Array,
