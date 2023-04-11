@@ -1,12 +1,12 @@
 <template>
   <div :class="classObj" class="app-wrapper">
     <div v-if="device==='mobile'&&sidebar.opened" class="drawer-bg" @click="handleClickOutside" />
-    <sidebar class="sidebar-container" />
+    <!-- <sidebar class="sidebar-container" />
     <div :class="{hasTagsView:needTagsView}" class="main-container">
       <div :class="{'fixed-header':fixedHeader}">
         <navbar />
         <tags-view v-if="needTagsView" />
-      </div>
+      </div> -->
       <app-main />
     </div>
   </div>
@@ -19,10 +19,10 @@ import { mapState } from 'vuex'
 export default {
   name: 'Layout',
   components: {
-    Navbar,
-    Sidebar,
-    AppMain,
-    TagsView
+    // Navbar,
+    // Sidebar,
+    // TagsView,
+    AppMain
   },
   mixins: [ResizeMixin],
   computed: {

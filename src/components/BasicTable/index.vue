@@ -8,14 +8,10 @@
           :search-form="searchForm"
           @searchFormEmit="searchFormEmit"
         />
-        <operation-button
-          :button-group="buttonGroup"
-          @operateEmit="operateEmit"
-        />
       </div>
       <div v-if="rightButtonGroup" style="display: flex;flex-direction: row;justify-content: space-between; height: 40px; margin-bottom: 20px;">
         <el-button type="" icon="el-icon-refresh" style="margin-right: 10px; margin-left: 10px;" @click="refresh" />
-        <el-popover
+        <!-- <el-popover
           placement="bottom"
           width="90"
           trigger="click"
@@ -24,7 +20,7 @@
           <div v-for="(item, index) in tableTitle" :key="index">
             <el-checkbox v-model="item.show" :label="item.label" size="large" />
           </div>
-        </el-popover>
+        </el-popover> -->
       </div>
     </div>
     <el-table
@@ -56,9 +52,9 @@
             align="center"
           >
             <template slot-scope="scope">
-              <el-tag :type="'success'">
+              <div style="color: #409EFF">
                 {{ scope.row.loginTotal }}
-              </el-tag>
+              </div>
             </template>
           </el-table-column>
           <el-table-column
@@ -105,8 +101,6 @@
           </div>
           <div v-else-if="item.type == 'router'">
             <router-link :to="{path: item.path, query: Object.assign({}, item.query, getQuery(item.params, scope.row))}" style="color: #409EFF">
-              <!-- Object.assign([], item.query, { [item.queryKey]: scope.row[item.queryValue] } ) -->
-              <!-- onlyHasPhone: item.onlyHasPhone, groupQQ: scope.row.groupQq -->
               {{ scope.row[item.value] }}
             </router-link>
           </div>
@@ -129,15 +123,14 @@
 </template>
 <script>
 import SearchForm from '@/components/SearchForm/index.vue'
-import OperationButton from '@/components/OperationButton/index.vue'
 export default {
   name: 'BasicTable',
-  components: { SearchForm, OperationButton },
+  components: { SearchForm },
   props: {
     // 基本
     tableTitle: { type: Array, default: Array },
     tableData: { type: Array, default: Array },
-    multipleTable: { type: Boolean, default: true },
+    multipleTable: { type: Boolean, default: false },
     pagination: { type: Boolean, default: true },
     showTable: { type: Boolean, default: true },
     loading: { type: Boolean, default: false },
@@ -175,9 +168,9 @@ export default {
     },
     leftheaderStyle(row) {
       // 隐藏表头复选框
-      if (row.columnIndex === 0 && row.rowIndex === 0) {
-        return 'seltAllbtnDis'
-      }
+      // if (row.columnIndex === 0 && row.rowIndex === 0) {
+      //   return 'seltAllbtnDis'
+      // }
       // 合并表头
       if (row.rowIndex === 1) {
         return 'header-row-display'

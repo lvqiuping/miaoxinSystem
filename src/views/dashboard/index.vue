@@ -7,67 +7,65 @@
             :table-title="tableTitle"
             :table-data="tableData"
             :loading="loading"
-            :multiple-table="true"
             :search-form="searchForm"
-            :button-group="buttonGroup"
-            @operateEmit2="operateEmit2"
+            :is-operation-btn="true"
             @refresh="getPageList(listQuery)"
             @searchFormEmit2="searchFormEmit2"
           >
             <template v-slot:advsTotal="scope">
-              <el-tag :type="'primary'">
+              <div style="color: #409EFF">
                 {{ scope.row.advsTotal }}
-              </el-tag>
+              </div>
             </template>
             <template v-slot:ChatingQty="scope">
-              <el-tag :type="'warning'">
+              <div style="color: #409EFF">
                 {{ scope.row.ChatingQty }}
-              </el-tag>
+              </div>
             </template>
           </basic-table>
         </el-card>
       </el-col>
     </el-row>
     <el-dialog :title="'日期：' + choseDate" :visible.sync="dialogTableVisible" width="100%">
-    <el-row :gutter="10" style="margin-bottom: 10px;">
-      <el-col v-if="pieChartData.length" :span="8">
-       <div class="pie">
-        <el-card>
-          <pie-chart :id="'1'" :pie-chart-data="pieChartData" :pie-title="'用户私聊消息数量'" />
-        </el-card>
-       </div>
-      </el-col>
-      <el-col v-if="pieChartData2.length" :span="8">
-        <div class="pie">
-        <el-card>
-          <pie-chart :id="'2'" :pie-chart-data="pieChartData2" :pie-title="'用户私聊次数'" />
-        </el-card>
-      </div>
-      </el-col>
-      <el-col v-if="pieChartData3.length" :span="8">
-        <div class="pie">
-        <el-card>
-          <div style="margin-bottom: 10px;">
-            <!-- display: flex; justify-content: flex-end; -->
-            <el-select
-              v-model="params3.deptName"
-              placeholder="请选择"
-              @change="handleOptions"
-            >
-              <el-option
-                v-for="item in options"
-                :key="item.value"
-                :label="item.label"
-                :value="item.value"
-              />
-            </el-select>
+      <el-row :gutter="10" style="margin-bottom: 10px;">
+        <el-col v-if="pieChartData.length" :span="8">
+          <div class="pie">
+            <el-card>
+              <pie-chart :id="'1'" :pie-chart-data="pieChartData" :pie-title="'用户私聊消息数量'" />
+            </el-card>
           </div>
-          <pie-chart :id="'3'" :pie-chart-data="pieChartData3" :height="'410px'" :pie-title="'业务部广告发布情况('+ params3.deptName +')'" />
-        </el-card>
-        </div>
-      </el-col>
-    </el-row>
-  </el-dialog>
+        </el-col>
+        <el-col v-if="pieChartData2.length" :span="8">
+          <div class="pie">
+            <el-card>
+              <pie-chart :id="'2'" :pie-chart-data="pieChartData2" :pie-title="'用户私聊次数'" />
+            </el-card>
+          </div>
+        </el-col>
+        <el-col v-if="pieChartData3.length" :span="8">
+          <div class="pie">
+            <el-card>
+              <div style="margin-bottom: 10px;">
+                <!-- display: flex; justify-content: flex-end; -->
+                <el-select
+                  v-model="params3.deptName"
+                  placeholder="请选择"
+                  @change="handleOptions"
+                >
+                  <el-option
+                    v-for="item in options"
+                    :key="item.value"
+                    :label="item.label"
+                    :value="item.value"
+                  />
+                </el-select>
+              </div>
+              <pie-chart :id="'3'" :pie-chart-data="pieChartData3" :height="'410px'" :pie-title="'业务部广告发布情况('+ params3.deptName +')'" />
+            </el-card>
+          </div>
+        </el-col>
+      </el-row>
+    </el-dialog>
   </div>
 </template>
 
@@ -77,7 +75,6 @@ import PieChart from './components/PieChart'
 import { msgqtyofchatingchart, numofchatingchart, saleschart, statsreport } from '@/api/dashboard'
 import moment from 'moment'
 import { timeThree } from '@/utils/index'
-import { TipsBox } from '@/utils/feedback'
 export default {
   name: 'Dashboard',
   components: {
@@ -104,18 +101,6 @@ export default {
           type: 'slot',
           slot: 'advsTotal'
         },
-        // {
-        //   label: 'PC端发送广告数',
-        //   value: 'pcTotal',
-        //   show: true,
-        //   type: 'text'
-        // },
-        // {
-        //   label: '手机端发送广告数',
-        //   value: 'andriodTotal',
-        //   show: true,
-        //   type: 'text'
-        // },
         {
           label: '不重复广告总数',
           value: 'advTotal',
@@ -135,60 +120,34 @@ export default {
           show: true,
           type: 'text'
         },
-        // {
-        //   label: '总在线人数',
-        //   value: 'loginTotal',
-        //   show: true,
-        //   type: 'text'
-        // },
-        // {
-        //   label: 'pc端在线人数',
-        //   value: 'LoginPCQty',
-        //   show: true,
-        //   type: 'text'
-        // },
-        // {
-        //   label: '手机端在线人数',
-        //   value: 'LoginAndriodQty',
-        //   show: true,
-        //   type: 'text'
-        // },
         {
           label: '一部',
           value: 'yibu',
           show: true,
           type: 'text'
         },
-        // {
-        //   label: '一部广告总数',
-        //   value: 'ADQty1',
-        //   show: true,
-        //   type: 'text'
-        // },
-        // {
-        //   label: '一部不重复广告数',
-        //   value: 'NorepeatADQty1',
-        //   show: true,
-        //   type: 'text'
-        // },
+
         {
           label: '二部',
           value: 'erbu',
           show: true,
           type: 'text'
+        },
+        {
+          label: '操作',
+          show: true,
+          type: 'options',
+          options: [
+            {
+              text: '查看报表',
+              icon: '',
+              type: 'primary',
+              clickEvent: (row) => {
+                this.operateCheck(row)
+              }
+            }
+          ]
         }
-        // {
-        //   label: '二部广告总数',
-        //   value: 'ADQty2',
-        //   show: true,
-        //   type: 'text'
-        // },
-        // {
-        //   label: '二部不重复广告数',
-        //   value: 'NorepeatADQty2',
-        //   show: true,
-        //   type: 'text'
-        // }
       ],
       tableData: [],
       listQuery: {},
@@ -224,19 +183,6 @@ export default {
         deptName: '',
         deptDate: ''
       },
-      buttonGroup: {
-        expend: true,
-        title: '表格筛选',
-        size: 'default',
-        fields: [
-          {
-            showButtonGroup: true,
-            text: '查看饼图',
-            icon: 'el-icon-search',
-            operateType: 'check'
-          }
-        ]
-      },
       choseDate: null
     }
   },
@@ -246,30 +192,20 @@ export default {
       beginTime: timeThree()[1],
       endTime: timeThree()[0]
     }
-    // this.getPieData1(this.listQuery.beginTime)
-    // this.getPieData2(this.listQuery.beginTime)
-    // this.getPieData3(this.params3.deptName, this.listQuery.beginTime)
     this.getPageList(this.listQuery)
   },
   methods: {
-    operateEmit2(v, list) {
-      if (v === 'check') {
-        if (list.length !== 1) {
-          TipsBox('warning', '请选择数据进行查看')
-          return
-        } else {
-          this.dialogTableVisible = true
-          this.pieChartData = []
-          this.pieChartData2 = []
-          this.pieChartData3 = []
-          const a = list[0].Date
-          this.choseDate = a
-          this.params3.deptDate = a
-          this.getPieData1(a)
-          this.getPieData2(a)
-          this.getPieData3(this.params3.deptName, a)
-        }
-      }
+    // 操作列按钮
+    operateCheck(row) {
+      this.dialogTableVisible = true
+      this.pieChartData = []
+      this.pieChartData2 = []
+      this.pieChartData3 = []
+      this.choseDate = row.Date
+      this.params3.deptDate = row.Date
+      this.getPieData1(row.Date)
+      this.getPieData2(row.Date)
+      this.getPieData3(this.params3.deptName, row.Date)
     },
     handleOptions(v) {
       this.pieChartData3 = []
