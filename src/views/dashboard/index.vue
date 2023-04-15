@@ -45,8 +45,7 @@
         <el-col v-if="pieChartData3.length" :span="8">
           <div class="pie">
             <el-card>
-              <div style="margin-bottom: 10px;">
-                <!-- display: flex; justify-content: flex-end; -->
+              <div style="margin-bottom: 10px;display: flex;justify-content: space-between;">
                 <el-select
                   v-model="params3.deptName"
                   placeholder="请选择"
@@ -59,6 +58,7 @@
                     :value="item.value"
                   />
                 </el-select>
+                <div style="font-size: 14px;line-height: 40px;color: #c23531;">活跃用户数： <span style="">{{ activeUsersNumber }}人</span></div>
               </div>
               <pie-chart :id="'3'" :pie-chart-data="pieChartData3" :height="'410px'" :pie-title="'业务部广告发布情况('+ params3.deptName +')'" />
             </el-card>
@@ -183,7 +183,8 @@ export default {
         deptName: '',
         deptDate: ''
       },
-      choseDate: null
+      choseDate: null,
+      activeUsersNumber: 0
     }
   },
   created() {
@@ -276,7 +277,13 @@ export default {
         if (res) {
           this.loadingDate3 = false
           this.name = res.DeptName
-          delete res.DeptName
+          delete res.DeptName // 删除某项
+          var b = 0 // 用户总数求和
+          for (var key1 in res) {
+            b += res[key1]
+          }
+          this.activeUsersNumber = b
+          // 区间
           const pieChartDataCoyp = []
           for (var key in res) {
             pieChartDataCoyp.push({ name: key, value: res[key] })
